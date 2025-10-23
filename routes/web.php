@@ -7,6 +7,7 @@ use App\Http\Controllers\FindingController;
 use App\Http\Controllers\RepairController;
 use App\Http\Controllers\RecapController;
 use App\Http\Controllers\AnalysisController;
+use App\Http\Controllers\UserController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -26,6 +27,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/recap', [RecapController::class, 'index'])->name('recap.index');
 
-    
     Route::get('/analysis', [AnalysisController::class, 'index'])->name('analysis.index');
+
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+
 });

@@ -11,10 +11,12 @@
                 </div>
             </div>
             <div class="flex items-center space-x-4"><span id="currentUser"
-                    class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full"></span> <button
-                    id="userManagementBtn" onclick="showTab('userManagement')"
-                    class="hidden bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center">
-                    <span class="mr-2">👥</span> Manajemen User </button>
+                    class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full"></span>
+                <a href="{{ route('users.index') }}"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center">
+                    <span class="mr-2">👥</span> Manajemen User
+                </a>
+
 
                 <a href="{{ route('logout') }}"
                     class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
