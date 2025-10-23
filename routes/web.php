@@ -23,6 +23,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/finding/create', [FindingController::class, 'index'])->name('finding.create');
 
+    Route::post('/', [FindingController::class, 'store'])->name('finding.store');
+
     Route::get('/repair/create', [RepairController::class, 'index'])->name('repair.create');
 
     Route::get('/recap', [RecapController::class, 'index'])->name('recap.index');
