@@ -9,19 +9,26 @@ use Illuminate\Http\Request;
 
 class RecapController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $nonconformities = Nonconformity::with('department')->get();
+        $departments = Department::select('uuid', 'abbrivation')->orderBy('abbrivation')->get();
 
-        // Add calculated completion_time for each item
+        $query = Nonconformity::with('department');
+
+        // Apply filter
+        if ($request->filled('department_uuid')) {
+            $query->where('department_uuid', $request->department_uuid);
+        }
+
+        $nonconformities = $query->get();
+
         foreach ($nonconformities as $item) {
             if ($item->found_date && $item->corrective_date) {
                 $found = \Carbon\Carbon::parse($item->found_date);
                 $corrective = \Carbon\Carbon::parse($item->corrective_date);
-                $hours = ceil($found->diffInMinutes($corrective) / 60); // minimum 1 hour
-                $item->completion_time = $hours;
+                $item->completion_time = ceil($found->diffInMinutes($corrective) / 60);
             } else {
-                $item->completion_time = null; // or 0 if you prefer
+                $item->completion_time = null;
             }
         }
 
@@ -32,10 +39,12 @@ class RecapController extends Controller
         ];
 
         return view('recap.index', [
+            'departments' => $departments,
             'count' => $counts,
             'nonconformities' => $nonconformities
         ]);
     }
+
 
 
     public function departmentStats()

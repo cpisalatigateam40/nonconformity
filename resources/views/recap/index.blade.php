@@ -54,17 +54,15 @@
         <div class="mb-6 flex flex-wrap gap-4 items-center justify-between">
             <div class="flex gap-4 items-center">
                 <label for="filterDepartment" class="text-sm font-medium text-gray-700">Filter Departemen:</label>
-                <select id="filterDepartment" onchange="updateRekapData()"
+                <select id="filterDepartment"
+                    onchange="window.location='?department_uuid='+this.value"
                     class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">Semua Departemen</option>
-                    <option value="BC">BC</option>
-                    <option value="SH">SH</option>
-                    <option value="FP">FP</option>
-                    <option value="SP">SP</option>
-                    <option value="WH">WH</option>
-                    <option value="ENG">ENG</option>
-                    <option value="QC">QC</option>
-                    <option value="PGA">PGA</option>
+                    @foreach ($departments as $dept)
+                    <option value="{{ $dept->uuid }}" {{ request('department_uuid') == $dept->uuid ? 'selected' : '' }}>
+                        {{ $dept->abbrivation }}
+                    </option>
+                    @endforeach
                 </select>
             </div>
 
