@@ -46,7 +46,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div class="bg-blue-50 rounded-lg p-4">
                 <div class="text-2xl font-bold text-blue-600" id="totalTemuanBulan">
-                    0
+                    {{$count['all']}}
                 </div>
                 <div class="text-sm text-gray-600">
                     Total Temuan
@@ -54,7 +54,7 @@
             </div>
             <div class="bg-green-50 rounded-lg p-4">
                 <div class="text-2xl font-bold text-green-600" id="totalClosedBulan">
-                    0
+                    {{$count['close']}}
                 </div>
                 <div class="text-sm text-gray-600">
                     Selesai
@@ -62,7 +62,7 @@
             </div>
             <div class="bg-red-50 rounded-lg p-4">
                 <div class="text-2xl font-bold text-red-600" id="totalOpenBulan">
-                    0
+                    {{$count['open']}}
                 </div>
                 <div class="text-sm text-gray-600">
                     Belum Selesai
@@ -70,7 +70,7 @@
             </div>
             <div class="bg-purple-50 rounded-lg p-4">
                 <div class="text-2xl font-bold text-purple-600" id="totalPoinBulan">
-                    0
+                    {{$count['point']}}
                 </div>
                 <div class="text-sm text-gray-600">
                     Total Poin Ketidaksesuaian
@@ -98,7 +98,16 @@
                         </tr>
                     </thead>
                     <tbody id="analisaTableBody">
-                        <!-- Data will be populated by JavaScript -->
+                        @foreach($departments as $department)
+                        <tr>
+                            <td>{{$department->abbrivation}}</td>
+                            <td>{{$department->total_findings}}</td>
+                            <td>{{$department->closed_findings}}</td>
+                            <td>{{$department->percentage_closed}}</td>
+                            <td>{{$department->totalCompletionDays}} hari</td>
+                            <td>{{$department->totalPoints ?? '0'}}</td>
+                        </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -121,17 +130,17 @@
     </div>
 
     <script>
-    function togglePeriodeFilter() {
-        const periode = document.getElementById('filterPeriode').value;
-        const bulananContainer = document.getElementById('filterBulananContainer');
+        function togglePeriodeFilter() {
+            const periode = document.getElementById('filterPeriode').value;
+            const bulananContainer = document.getElementById('filterBulananContainer');
 
-        if (periode === 'tahunan') {
-            bulananContainer.style.display = 'none';
-        } else {
-            bulananContainer.style.display = 'flex';
+            if (periode === 'tahunan') {
+                bulananContainer.style.display = 'none';
+            } else {
+                bulananContainer.style.display = 'flex';
+            }
+
+            updateAnalisaBulanan();
         }
-
-        updateAnalisaBulanan();
-    }
     </script>
     @endsection

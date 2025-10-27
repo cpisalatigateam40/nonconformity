@@ -33,4 +33,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
+    Route::get('/nonconformity/{uuid}/data', [FindingController::class, 'fetchData'])->name('nonconformity.fetch-data');
+
+    Route::post('/repair/update', [RepairController::class, 'updateRepair'])->name('perbaikan.storeUpdate');
+
+    Route::get('/department-stats', [RecapController::class, 'departmentStats']);
 });
