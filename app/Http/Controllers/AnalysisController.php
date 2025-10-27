@@ -8,12 +8,31 @@ use Illuminate\Http\Request;
 
 class AnalysisController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $nonconformities = Nonconformity::get();
+        // --- Get all distinct years from found_date ---
+        $years = Nonconformity::selectRaw('YEAR(found_date) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        // --- Filters ---
+        $selectedYear = $request->input('tahun', now()->year);
+        $selectedMonth = $request->input('bulan', now()->month);
+        $periode = $request->input('periode', 'bulanan'); // default monthly
+
+        $query = Nonconformity::query();
+
+        if ($periode === 'bulanan') {
+            $query->whereYear('found_date', $selectedYear)
+                ->whereMonth('found_date', $selectedMonth);
+        } else {
+            $query->whereYear('found_date', $selectedYear);
+        }
+
+        $nonconformities = $query->with('department')->get();
 
         $allpoint = $nonconformities->sum('point') + $nonconformities->count();
-
         $counts = [
             'all' => $nonconformities->count(),
             'close' => $nonconformities->where('status', 1)->count(),
@@ -21,46 +40,49 @@ class AnalysisController extends Controller
             'point' => $allpoint,
         ];
 
-        $departments = Department::with('nonconformities')->get();
+        // --- Group by Department for Analysis ---
+        $departments = Department::with(['nonconformities' => function ($q) use ($periode, $selectedYear, $selectedMonth) {
+            if ($periode === 'bulanan') {
+                $q->whereYear('found_date', $selectedYear)
+                    ->whereMonth('found_date', $selectedMonth);
+            } else {
+                $q->whereYear('found_date', $selectedYear);
+            }
+        }])->get();
 
         foreach ($departments as $department) {
             $ncs = $department->nonconformities;
 
-            // Total findings
             $total = $ncs->count();
-
-            // Closed nonconformities
             $closed = $ncs->where('status', 1)->count();
-
-            // Percentage of closed vs total
             $percentage = $total > 0 ? round(($closed / $total) * 100, 1) : 0;
 
-            // Completion time in days (sum)
+            // Compute total completion days
             $totalCompletionDays = 0;
-
             foreach ($ncs as $nc) {
                 if ($nc->found_date && $nc->corrective_date) {
                     $found = \Carbon\Carbon::parse($nc->found_date);
                     $corrective = \Carbon\Carbon::parse($nc->corrective_date);
-                    $diffDays = ceil($found->diffInMinutes($corrective) / (60 * 24)); // round up to days
-                    $totalCompletionDays += $diffDays;
+                    $totalCompletionDays += ceil($found->diffInMinutes($corrective) / (60 * 24));
                 }
             }
 
-            // Total points = total findings + sum of points
             $totalPoints = $total + $ncs->sum('point');
 
-            // Attach computed data to department model
             $department->total_findings = $total;
             $department->closed_findings = $closed;
             $department->percentage_closed = $percentage;
-            $department->completion_days = $totalCompletionDays;
-            $department->total_points = $totalPoints;
+            $department->totalCompletionDays = $totalCompletionDays;
+            $department->totalPoints = $totalPoints;
         }
 
         return view('analysis.index', [
             'count' => $counts,
             'departments' => $departments,
+            'years' => $years,
+            'selectedYear' => $selectedYear,
+            'selectedMonth' => $selectedMonth,
+            'periode' => $periode,
         ]);
     }
 }
