@@ -12,11 +12,12 @@ class Nonconformity extends Model
 
     protected $table = "nonconformities";
     protected $primaryKey = "id";
+
     protected $fillable = [
         'document_number',
         'found_date',
         'department_uuid',
-        'nonconformity_documentiation',
+        'nonconformity_documentation',
         'description',
         'information',
         'location',
@@ -26,8 +27,8 @@ class Nonconformity extends Model
         'status',
     ];
 
-    public function users()
+    public function department()
     {
-        return $this->hasMany(User::class, 'department_uuid', 'uuid');
+        return $this->belongsTo(Department::class, 'department_uuid', 'uuid');
     }
 }

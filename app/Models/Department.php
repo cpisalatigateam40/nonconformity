@@ -13,14 +13,20 @@ class Department extends Model
 
     protected $table = "departments";
     protected $primaryKey = "id";
+
     protected $fillable = [
         'uuid',
         'department',
-        'abbrivation'
+        'abbrivation',
     ];
 
     public function users()
     {
         return $this->hasMany(User::class, 'department_uuid', 'uuid');
+    }
+
+    public function nonconformities()
+    {
+        return $this->hasMany(Nonconformity::class, 'department_uuid', 'uuid');
     }
 }
