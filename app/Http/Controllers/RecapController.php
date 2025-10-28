@@ -46,12 +46,12 @@ class RecapController extends Controller
             $nonconformities = $dept->nonconformities;
 
             $total = $nonconformities->count();
-            $closed = $nonconformities->where('status', 'Closed')->count();
+            $closedData = $nonconformities->where('status', 1);
+            $closed = $closedData->count();
             $percentage = $total > 0 ? round(($closed / $total) * 100) : 0;
 
-            // Total and average completion time
+            // Total waktu perbaikan
             $totalHours = 0;
-            $closedData = $nonconformities->where('status', 'Closed');
             foreach ($closedData as $item) {
                 if ($item->found_date && $item->corrective_date) {
                     $start = Carbon::parse($item->found_date);
@@ -64,7 +64,7 @@ class RecapController extends Controller
             $avgHours = $closed > 0 ? round($totalHours / $closed) : 0;
             $avgDays = round($avgHours / 24, 1);
 
-            // Total points (base + additional)
+            // Total poin (base + tambahan)
             $totalPoinTambahan = $closedData->sum('point');
             $totalPoin = $total + $totalPoinTambahan;
 
@@ -81,4 +81,51 @@ class RecapController extends Controller
 
         return response()->json($stats);
     }
+
+    public function filter(Request $request)
+    {
+        $query = Nonconformity::with('department');
+
+        if ($request->department) {
+            $query->whereHas('department', function ($q) use ($request) {
+                $q->where('abbrivation', $request->department);
+            });
+        }
+
+        $nonconformities = $query->get();
+
+        foreach ($nonconformities as $item) {
+            if ($item->found_date && $item->corrective_date) {
+                $found = \Carbon\Carbon::parse($item->found_date);
+                $corrective = \Carbon\Carbon::parse($item->corrective_date);
+                $hours = ceil($found->diffInMinutes($corrective) / 60);
+                $item->completion_time = $hours;
+            } else {
+                $item->completion_time = null;
+            }
+        }
+
+        return response()->json($nonconformities);
+    }
+
+    public function destroy($uuid)
+    {
+        try {
+            $nonconformity = Nonconformity::where('uuid', $uuid)->firstOrFail();
+            $nonconformity->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data ketidaksesuaian berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menghapus data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
 }

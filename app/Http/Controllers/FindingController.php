@@ -51,7 +51,7 @@ class FindingController extends Controller
         ]);
 
         return redirect()
-            ->route('finding.create')
+            ->route('recap.index')
             ->with('success', 'Temuan berhasil disimpan!');
     }
 

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('document_number');
             $table->dateTime('found_date');
             $table->uuid('department_uuid');
-            $table->string('nonconformity_documentiation');
+            $table->string('nonconformity_documentiation')->nullable();
             $table->longText('description');
             $table->string('information');
             $table->string('location');

@@ -1,6 +1,13 @@
 @extends('layouts.layout')
 
 @section('content')
+<style>
+.analisa-table, .analisa-table th, .analisa-table td {
+  border: 1px solid #d1d5db !important;
+  border-collapse: collapse !important;
+}
+</style>
+
 <div id="analisaTab">
     <div class="bg-white rounded-xl shadow-lg p-8">
         <div class="mb-6">
@@ -77,7 +84,7 @@
         <div class="mb-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Analisa Per Departemen</h3>
             <div class="overflow-x-auto">
-                <table class="w-full border-collapse border border-gray-300">
+                <table class="w-full analisa-table">
                     <thead>
                         <tr class="bg-gray-50">
                             <th class="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700">Departemen</th>
@@ -104,17 +111,99 @@
             </div>
         </div>
 
-        <!-- Chart Area (optional visualization) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-gray-50 rounded-lg p-6">
-                <h4 class="text-md font-semibold text-gray-800 mb-4">Ranking Departemen Terbaik</h4>
-                <div id="rankingChart" class="space-y-3"></div>
+        @if($departments->count() > 0 && $departments->sum('total_findings') > 0)
+            <!-- Chart Area -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Ranking Departemen Terbaik -->
+                @php
+                    $ranked = $departments->sortByDesc('percentage_closed')->take(5);
+                @endphp
+                @if($ranked->count() > 0)
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <h4 class="text-md font-semibold text-gray-800 mb-4">Ranking Departemen Terbaik</h4>
+                    <div id="rankingChart" class="space-y-3">
+                        @foreach($ranked as $dept)
+                            @php
+                                switch ($loop->iteration) {
+                                    case 1:
+                                        $icon = '🥇';
+                                        $bg = 'bg-yellow-100';
+                                        $color = 'text-yellow-600';
+                                        break;
+                                    case 2:
+                                        $icon = '🥈';
+                                        $bg = 'bg-gray-200';
+                                        $color = 'text-gray-600';
+                                        break;
+                                    case 3:
+                                        $icon = '🥉';
+                                        $bg = 'bg-amber-200';
+                                        $color = 'text-amber-700';
+                                        break;
+                                    default:
+                                        $icon = '';
+                                        $bg = 'bg-gray-100';
+                                        $color = 'text-gray-400';
+                                        break;
+                                }
+                            @endphp
+
+                            <div class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 flex items-center justify-center rounded-full {{ $bg }} {{ $color }}">
+                                        {{ $icon }}
+                                    </div>
+                                    <div>
+                                        <h5 class="font-semibold text-gray-800">{{ $dept->abbrivation }}</h5>
+                                        <p class="text-sm text-gray-500">
+                                            {{ $dept->percentage_closed }}% selesai • 
+                                            Rata-rata {{ round(($dept->totalPoints ?? 0) / max($dept->total_findings,1),1) }} poin/temuan
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-600 text-right">
+                                    {{ $dept->closed_findings }}/{{ $dept->total_findings }}<br>
+                                    <span class="text-xs text-gray-400">{{ $dept->totalPoints ?? 0 }} total poin</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+
+                <!-- Tingkat Penyelesaian per Departemen -->
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <h4 class="text-md font-semibold text-gray-800 mb-4">Tingkat Penyelesaian per Departemen</h4>
+                    @if($departments->count() > 0)
+                    <div id="completionChart" class="space-y-4">
+                        @foreach($departments as $dept)
+                            @if($dept->total_findings > 0)
+                            <div>
+                                <div class="flex justify-between mb-1 text-sm text-gray-700">
+                                    <span class="font-medium">{{ $dept->abbrivation }}</span>
+                                    <span>{{ $dept->percentage_closed }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="bg-green-500 h-3 rounded-full transition-all duration-700" 
+                                        style="width: {{ $dept->percentage_closed }}%">
+                                    </div>
+                                </div>
+                                <div class="text-xs text-right text-gray-400 mt-1">
+                                    {{ $dept->closed_findings }}/{{ $dept->total_findings }}
+                                </div>
+                            </div>
+                            @endif
+                        @endforeach
+                    </div>
+                    @else
+                        <p class="text-sm text-gray-500">Tidak ada data departemen untuk ditampilkan.</p>
+                    @endif
+                </div>
             </div>
-            <div class="bg-gray-50 rounded-lg p-6">
-                <h4 class="text-md font-semibold text-gray-800 mb-4">Tingkat Penyelesaian per Departemen</h4>
-                <div id="completionChart" class="space-y-3"></div>
-            </div>
-        </div>
+        @endif
+
+
     </div>
 </div>
 
@@ -158,5 +247,13 @@
 
         window.location.href = "{{ route('analysis.index') }}" + query;
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('#completionChart .bg-green-500').forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0';
+            setTimeout(() => { bar.style.width = width; }, 200);
+        });
+    });
 </script>
 @endsection

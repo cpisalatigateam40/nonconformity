@@ -38,4 +38,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/repair/update', [RepairController::class, 'updateRepair'])->name('perbaikan.storeUpdate');
 
     Route::get('/department-stats', [RecapController::class, 'departmentStats']);
+
+    Route::get('/recap/filter', [RecapController::class, 'filter'])->name('recap.filter');
+
+    Route::delete('/recap/{uuid}', [RecapController::class, 'destroy'])->name('recap.destroy');
+
+
 });

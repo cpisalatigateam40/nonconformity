@@ -30,7 +30,8 @@
         <!-- Statistik Per Departemen -->
         <div class="mb-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                <span class="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs mr-2">🏢</span>
+                <span
+                    class="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs mr-2">🏢</span>
                 Statistik Per Departemen
             </h3>
 
@@ -40,9 +41,9 @@
                     <div class="flex items-center space-x-2 text-gray-500">
                         <svg class="animate-spin h-5 w-5 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                         </svg>
                         <span>Memuat statistik departemen...</span>
                     </div>
@@ -75,7 +76,7 @@
 
         <!-- Tabel Rekap -->
         <div class="table-responsive">
-            <table class="border-collapse bordered">
+            <table class="min-w-full border border-gray-300 border-collapse">
                 <thead>
                     <tr class="bg-gray-50">
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700">No.
@@ -95,38 +96,39 @@
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700">Poin
                             Tambahan</th>
                         <th id="actionHeader"
-                            class="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700 hidden">
+                            class="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700">
                             Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="rekapTableBody">
                     @forelse($nonconformities as $index => $item)
                     <tr>
-                        <td>{{$item->document_number}}</td>
-                        <td>{{$item->found_date}}</td>
-                        <td>{{$item->description}}</td>
-                        <td>{{$item->location}}</td>
-                        <td>{{$item->department->department}}</td>
-                        <td>
+                        <td class="border border-gray-300 px-4 py-2">{{ $item->document_number }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ $item->found_date }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ $item->description }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ $item->location }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ $item->department->department }}</td>
+                        <td class="border border-gray-300 px-4 py-2">
                             @if ($item->status == '0')
-                            <span class="px-2 py-1 rounded-full text-sm bg-red-100 text-red-700">
-                                Open
-                            </span>
+                            <span class="px-2 py-1 rounded-full text-sm bg-red-100 text-red-700">Open</span>
                             @elseif ($item->status == '1')
-                            <span class="px-2 py-1 rounded-full text-sm bg-green-100 text-green-700">
-                                Close
-                            </span>
+                            <span class="px-2 py-1 rounded-full text-sm bg-green-100 text-green-700">Close</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="border border-gray-300 px-4 py-2">
                             @if($item->completion_time)
                             {{ $item->completion_time }} jam
                             @else
                             -
                             @endif
                         </td>
-                        <td>
-                            {{$item->point ?? '-'}}
+                        <td class="border border-gray-300 px-4 py-2">{{ $item->point ?? '-' }}</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                             <button 
+                                onclick="deleteData('{{ $item->uuid }}')" 
+                                class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                Hapus
+                            </button>
                         </td>
                     </tr>
                     @empty
@@ -139,36 +141,37 @@
                 </tbody>
             </table>
         </div>
+
     </div>
 </div>
-@endsection
-@push('scripts')
+
 <script>
-    document.addEventListener("DOMContentLoaded", async function() {
-        const container = document.getElementById('departmentStats');
-        const loader = document.getElementById('loadingStats');
+document.addEventListener("DOMContentLoaded", async function() {
+    const container = document.getElementById('departmentStats');
+    const loader = document.getElementById('loadingStats');
 
-        try {
-            const res = await fetch('/department-stats');
-            const stats = await res.json();
+    try {
+        const res = await fetch('/department-stats');
+        const stats = await res.json();
 
-            loader.remove(); // Remove spinner once data is ready
-            container.innerHTML = ''; // Clear container
+        loader.remove(); // Remove spinner once data is ready
+        container.innerHTML = ''; // Clear container
 
-            if (stats.length === 0) {
-                container.innerHTML = `
+        if (stats.length === 0) {
+            container.innerHTML = `
                 <div class="col-span-full text-center text-gray-500 py-8">
                     Tidak ada data ketidaksesuaian.
                 </div>
             `;
-                return;
-            }
+            return;
+        }
 
-            stats.forEach(stat => {
-                const card = document.createElement('div');
-                card.className = 'bg-white border border-gray-200 rounded-lg p-4 shadow-sm transition hover:shadow-md';
+        stats.forEach(stat => {
+            const card = document.createElement('div');
+            card.className =
+                'bg-white border border-gray-200 rounded-lg p-4 shadow-sm transition hover:shadow-md';
 
-                card.innerHTML = `
+            card.innerHTML = `
                 <div class="text-center">
                     <h4 class="font-bold text-gray-800 text-lg mb-2">${stat.department}</h4>
                     
@@ -197,17 +200,93 @@
                     </div>
                 </div>
             `;
-                container.appendChild(card);
-            });
+            container.appendChild(card);
+        });
 
-        } catch (error) {
-            console.error('Error loading stats:', error);
-            loader.innerHTML = `
+    } catch (error) {
+        console.error('Error loading stats:', error);
+        loader.innerHTML = `
             <div class="col-span-full text-center text-red-500 py-8">
                 Gagal memuat data statistik.
             </div>
         `;
+    }
+});
+
+async function updateRekapData() {
+    const dept = document.getElementById('filterDepartment').value;
+    const tbody = document.getElementById('rekapTableBody');
+
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="9" class="text-center py-6 text-gray-500">Memuat data...</td>
+        </tr>
+    `;
+
+    try {
+        const res = await fetch(`/recap/filter?department=${dept}`);
+        const data = await res.json();
+
+        if (data.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center py-6 text-gray-500">Tidak ada data untuk departemen ini.</td>
+                </tr>
+            `;
+            return;
         }
-    });
+
+        tbody.innerHTML = '';
+        data.forEach(item => {
+            tbody.innerHTML += `
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">${item.document_number}</td>
+                    <td class="border border-gray-300 px-4 py-2">${item.found_date}</td>
+                    <td class="border border-gray-300 px-4 py-2">${item.description}</td>
+                    <td class="border border-gray-300 px-4 py-2">${item.location}</td>
+                    <td class="border border-gray-300 px-4 py-2">${item.department.department}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        ${item.status == 0
+                            ? `<span class="px-2 py-1 rounded-full text-sm bg-red-100 text-red-700">Open</span>`
+                            : `<span class="px-2 py-1 rounded-full text-sm bg-green-100 text-green-700">Close</span>`
+                        }
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        ${item.completion_time ? item.completion_time + ' jam' : '-'}
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">${item.point ?? '-'}</td>
+                </tr>
+            `;
+        });
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center py-6 text-red-500">Gagal memuat data.</td>
+            </tr>
+        `;
+    }
+}
+
+async function deleteData(uuid) {
+    if (!confirm('Yakin ingin menghapus data ini?')) return;
+
+    try {
+        const res = await fetch(`/recap/${uuid}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await res.json();
+        alert(data.message);
+        if (data.status === 'success') location.reload();
+    } catch (error) {
+        alert('Terjadi kesalahan saat menghapus data.');
+        console.error(error);
+    }
+}
 </script>
-@endpush
+@endsection

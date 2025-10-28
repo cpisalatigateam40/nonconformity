@@ -44,6 +44,10 @@ class RepairController extends Controller
             'status' => 1
         ]);
 
-        return redirect()->back()->with('success', 'Data perbaikan berhasil diperbarui.');
+        // return redirect()->back()->with('success', 'Data perbaikan berhasil diperbarui.');
+
+        return redirect()
+            ->route('recap.index')
+            ->with('success', 'Data perbaikan berhasil diperbarui.');
     }
 }
