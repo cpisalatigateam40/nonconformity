@@ -29,20 +29,29 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'can create users']);
         Permission::create(['name' => 'can edit users']);
         Permission::create(['name' => 'can delete users']);
-        Permission::create(['name' => 'can manage access users']);
-        Permission::create(['name' => 'can access departments']);
-        Permission::create(['name' => 'can create departments']);
-        Permission::create(['name' => 'can edit departments']);
-        Permission::create(['name' => 'can delete departments']);
-        Permission::create(['name' => 'can access plants']);
-        Permission::create(['name' => 'can create plants']);
-        Permission::create(['name' => 'can edit plants']);
-        Permission::create(['name' => 'can delete plants']);
+        Permission::create(['name' => 'can access temuan']);
+        Permission::create(['name' => 'can access perbaikan']);
+        Permission::create(['name' => 'can choose departments']);
+        Permission::create(['name' => 'can delete data']);
 
         $roleSuperadmin = Role::create(['name' => 'Superadmin']);
-        $roleAuditor = Role::create(['name' => 'Auditor']);
-        $roleAuditee = Role::create(['name' => 'Auditee']);
-        $roleManager = Role::create(['name' => 'Manager']);
+        $roleAuditor    = Role::create(['name' => 'Auditor']);
+        $roleAuditee    = Role::create(['name' => 'Auditee']);
+        $roleManager    = Role::create(['name' => 'Manager']);
+
+        // Superadmin: get all permissions
         $roleSuperadmin->givePermissionTo(Permission::all());
+
+        // Auditor: get all except 'can access perbaikan' and 'can access users'
+        $auditorPermissions = Permission::whereNotIn('name', [
+            'can access perbaikan',
+            'can access users',
+        ])->get();
+        $roleAuditor->givePermissionTo($auditorPermissions);
+
+        // Auditee: only 'can access perbaikan'
+        $roleAuditee->givePermissionTo('can access perbaikan');
+
+        $roleManager->givePermissionTo('can choose departments');
     }
 }

@@ -6,12 +6,18 @@ use App\Models\Department;
 use App\Models\Nonconformity;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RecapController extends Controller
 {
     public function index()
     {
-        $nonconformities = Nonconformity::with('department')->get();
+        $user = Auth::user();
+        if ($user->hasRole('Auditee')) {
+            $nonconformities = Nonconformity::with('department')->where('department_uuid', $user->department_uuid)->get();
+        } else {
+            $nonconformities = Nonconformity::with('department')->get();
+        }
 
         // Add calculated completion_time for each item
         foreach ($nonconformities as $item) {
@@ -125,7 +131,4 @@ class RecapController extends Controller
             ], 500);
         }
     }
-
-
-
 }

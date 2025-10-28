@@ -17,7 +17,7 @@ class Nonconformity extends Model
         'document_number',
         'found_date',
         'department_uuid',
-        'nonconformity_documentation',
+        'nonconformity_documentiation',
         'description',
         'information',
         'location',

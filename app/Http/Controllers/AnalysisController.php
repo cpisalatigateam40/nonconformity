@@ -63,7 +63,8 @@ class AnalysisController extends Controller
                 if ($nc->found_date && $nc->corrective_date) {
                     $found = \Carbon\Carbon::parse($nc->found_date);
                     $corrective = \Carbon\Carbon::parse($nc->corrective_date);
-                    $totalCompletionDays += ceil($found->diffInMinutes($corrective) / (60 * 24));
+                    $diffDays = $found->diffInMinutes($corrective) / (60 * 24);
+                    $totalCompletionDays += ($diffDays < 1) ? 0 : ceil($diffDays);
                 }
             }
 

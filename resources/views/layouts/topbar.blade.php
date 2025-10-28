@@ -12,11 +12,12 @@
             </div>
             <div class="flex items-center space-x-4"><span id="currentUser"
                     class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full"></span>
+                @can('can access users')
                 <a href="{{ route('users.index') }}"
                     class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center">
                     <span class="mr-2">👥</span> Manajemen User
                 </a>
-
+                @endcan
 
                 <a href="{{ route('logout') }}"
                     class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
@@ -31,15 +32,19 @@
 
 <div class="container max-w-7xl mx-auto bg-white rounded-2xl mt-7">
     <div class="flex border-b border-gray-200">
+        @can('can access temuan')
         <a href="{{ route('finding.create') }}" id="tabInput1"
             class="px-6 py-4 text-sm font-medium {{ request()->routeIs('finding.create') ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700' }}">
             Input Temuan
         </a>
+        @endcan
 
+        @can('can access perbaikan')
         <a href="{{ route('repair.create') }}" id="tabInput2"
             class="px-6 py-4 text-sm font-medium {{ request()->routeIs('repair.create') ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700' }}">
             Input Perbaikan
         </a>
+        @endcan
 
         <a href="{{ route('recap.index') }}" id="tabRekap"
             class="px-6 py-4 text-sm font-medium {{ request()->routeIs('recap.index') ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700' }}">

@@ -5,14 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Nonconformity;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RepairController extends Controller
 {
-    public function index()
+    public function index($uuid = null)
     {
-        $nonconformities = Nonconformity::all();
+        $user = Auth::user();
+        if ($user->hasRole('Auditee')) {
+            $nonconformities = Nonconformity::with('department')->where('department_uuid', $user->department_uuid)->get();
+        } else {
+            $nonconformities = Nonconformity::with('department')->get();
+        }
+
         return view('repair.create', [
-            'nonconformities' => $nonconformities
+            'nonconformities' => $nonconformities,
+            'selectedUuid' => $uuid, // pass the preselected UUID to the view
         ]);
     }
 

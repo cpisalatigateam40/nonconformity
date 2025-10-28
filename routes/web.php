@@ -25,7 +25,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/', [FindingController::class, 'store'])->name('finding.store');
 
-    Route::get('/repair/create', [RepairController::class, 'index'])->name('repair.create');
+    Route::get('/repair/create/{uuid?}', [RepairController::class, 'index'])->name('repair.create');
 
     Route::get('/recap', [RecapController::class, 'index'])->name('recap.index');
 
@@ -43,5 +43,5 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/recap/{uuid}', [RecapController::class, 'destroy'])->name('recap.destroy');
 
-
+    Route::get('/nonconformity/{uuid}/data-modal', [FindingController::class, 'fetchDataModal'])->name('nonconformity.fetchDataModal');
 });

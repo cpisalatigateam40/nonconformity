@@ -38,12 +38,19 @@
 
             {{-- Dropdown Nomor Dokumen --}}
             <div class="mb-6">
-                <label for="nomorDokumen" class="block text-sm font-medium text-gray-700 mb-2">Nomor Dokumen</label>
+                <label for="nomorDokumen" class="block text-sm font-medium text-gray-700 mb-2">
+                    Nomor Dokumen
+                </label>
+
                 <select name="asset_uuid" id="nomorDokumen" onchange="loadTemuanData(this.value)"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                     <option value="" hidden>-- Pilih Nomor Dokumen --</option>
+
                     @foreach($nonconformities as $nonconformity)
-                    <option value="{{ $nonconformity->uuid }}">{{ $nonconformity->document_number }}</option>
+                    <option value="{{ $nonconformity->uuid }}"
+                        {{ (isset($selectedUuid) && $selectedUuid === $nonconformity->uuid) ? 'selected' : '' }}>
+                        {{ $nonconformity->document_number }}
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -122,6 +129,12 @@
     document.getElementById('updatePerbaikanForm').addEventListener('submit', function(e) {
         const now = new Date();
         document.getElementById('tanggalPerbaikan').value = now.toLocaleString('id-ID');
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const preselected = document.getElementById('nomorDokumen').value;
+        if (preselected) {
+            loadTemuanData(preselected);
+        }
     });
 </script>
 @endsection
