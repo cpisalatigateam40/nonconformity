@@ -13,9 +13,9 @@ class RepairController extends Controller
     {
         $user = Auth::user();
         if ($user->hasRole('Auditee')) {
-            $nonconformities = Nonconformity::with('department')->where('department_uuid', $user->department_uuid)->get();
+            $nonconformities = Nonconformity::with('department')->where('department_uuid', $user->department_uuid)->where('status', 0)->get();
         } else {
-            $nonconformities = Nonconformity::with('department')->get();
+            $nonconformities = Nonconformity::with('department')->where('status', 0)->get();
         }
 
         return view('repair.create', [

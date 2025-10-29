@@ -56,18 +56,21 @@ class FindingController extends Controller
 
     public function fetchData($uuid)
     {
-        // Find by UUID
         $nonconformity = Nonconformity::where('uuid', $uuid)->first();
 
         if (!$nonconformity) {
             return response()->json(['error' => 'Data not found'], 404);
         }
 
-        // Return only the needed fields
         return response()->json([
             'title' => $nonconformity->location ?? null,
             'description' => $nonconformity->description ?? null,
-            'created_at' => $nonconformity->created_at ? $nonconformity->created_at->format('d-m-Y H:i') : null,
+            'created_at' => $nonconformity->created_at
+                ? $nonconformity->created_at->format('d-m-Y H:i')
+                : null,
+            'image' => $nonconformity->nonconformity_documentiation
+                ? asset('storage/' . $nonconformity->nonconformity_documentiation)
+                : null,
         ]);
     }
 

@@ -107,12 +107,18 @@
                     @forelse($nonconformities as $index => $item)
                     <tr>
                         @can('can access perbaikan')
+                        @if($item->status == '0')
                         <td class="border border-gray-300 px-4 py-2">
                             <a href="{{ route('repair.create', ['uuid' => $item->uuid]) }}"
                                 class="text-blue-600 hover:underline">
                                 {{ $item->document_number }}
                             </a>
                         </td>
+                        @else
+                        <td class="border border-gray-300 px-4 py-2 text-gray-500">
+                            {{ $item->document_number }}
+                        </td>
+                        @endif
                         @else
                         <td class="border border-gray-300 px-4 py-2 text-gray-500">
                             {{ $item->document_number }}
@@ -137,9 +143,9 @@
                             @endif
                         </td>
                         <td class="border border-gray-300 px-4 py-2">{{ $item->point ?? '-' }}</td>
-                        <td class="border border-gray-300 px-4 py-2">
+                        <td class="border px-4 py-2 flex gap-2">
                             <button
-                                class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-md detail-btn"
+                                class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded detail-btn"
                                 data-uuid="{{ $item->uuid }}">
                                 Detail
                             </button>

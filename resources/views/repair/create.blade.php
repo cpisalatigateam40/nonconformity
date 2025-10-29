@@ -25,6 +25,7 @@
     </ul>
 </div>
 @endif
+
 <div id="input2Tab" class="fade-in">
     <div class="bg-white rounded-xl shadow-lg p-8">
         <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
@@ -56,9 +57,9 @@
             </div>
 
             {{-- Informasi Temuan --}}
-            <div id="temuanInfo" class="hidden bg-gray-50 rounded-lg p-4 mb-6">
-                <h3 class="font-medium text-gray-800 mb-2">Informasi Temuan:</h3>
-                <div id="temuanDetails" class="text-sm text-gray-600"></div>
+            <div id="temuanInfo" class="hidden bg-gray-50 rounded-lg p-6 mb-6 border border-gray-200">
+                <h3 class="font-semibold text-gray-800 mb-4">Informasi Temuan</h3>
+                <div id="temuanDetails" class="text-sm text-gray-700"></div>
             </div>
 
             {{-- Foto After --}}
@@ -102,7 +103,7 @@
     function loadTemuanData(uuid) {
         if (!uuid) return;
 
-        const url = `/nonconformity/${uuid}/data`; // or use route name if you want Blade to generate it
+        const url = `/nonconformity/${uuid}/data`;
 
         fetch(url)
             .then(response => response.json())
@@ -112,10 +113,37 @@
 
                 if (data && !data.error) {
                     infoDiv.classList.remove('hidden');
+
+                    const textInfo = `
+                    <div class="space-y-2">
+                        <p><strong>Tanggal Temuan:</strong> ${data.created_at ?? '-'}</p>
+                        <p><strong>Deskripsi:</strong> ${data.description ?? '-'}</p>
+                        <p><strong>Lokasi:</strong> ${data.title ?? '-'}</p>
+                    </div>
+                `;
+
+                    let imageInfo = `
+                    <div class="flex items-center justify-center text-gray-500 italic">
+                        Belum ada foto temuan
+                    </div>
+                `;
+
+                    if (data.image) {
+                        imageInfo = `
+                        <div class="flex justify-center items-center">
+                            <a href="${data.image}" target="_blank">
+                                <img src="${data.image}" alt="Foto Temuan"
+                                     class="rounded-lg border border-gray-300 max-h-64 object-contain hover:opacity-90 transition">
+                            </a>
+                        </div>
+                    `;
+                    }
+
                     detailsDiv.innerHTML = `
-                    <p><strong>Tanggal Temuan:</strong> ${data.created_at ?? '-'}</p>
-                    <p><strong>Deskripsi:</strong> ${data.description ?? '-'}</p>
-                    <p><strong>Lokasi:</strong> ${data.title ?? '-'}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        <div>${textInfo}</div>
+                        <div>${imageInfo}</div>
+                    </div>
                 `;
                 } else {
                     infoDiv.classList.add('hidden');
@@ -125,16 +153,23 @@
             .catch(err => console.error(err));
     }
 
-    // Set timestamp automatically on submit
+    // Automatically set timestamp when submitting
     document.getElementById('updatePerbaikanForm').addEventListener('submit', function(e) {
         const now = new Date();
         document.getElementById('tanggalPerbaikan').value = now.toLocaleString('id-ID');
     });
-    document.addEventListener('DOMContentLoaded', function() {
-        const preselected = document.getElementById('nomorDokumen').value;
-        if (preselected) {
-            loadTemuanData(preselected);
+
+    // Initialize autoload (runs on load or Rekap click)
+    function initTemuanAutoload() {
+        const dropdown = document.getElementById('nomorDokumen');
+        if (dropdown && dropdown.value) {
+            loadTemuanData(dropdown.value);
         }
-    });
+    }
+
+    document.addEventListener('DOMContentLoaded', initTemuanAutoload);
+
+    // Optional: re-run when clicking Rekap tab (adjust selector if needed)
+    document.getElementById('rekapTabButton')?.addEventListener('click', initTemuanAutoload);
 </script>
 @endsection
