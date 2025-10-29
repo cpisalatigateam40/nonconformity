@@ -98,12 +98,28 @@
                     <tbody id="analisaTableBody">
                         @foreach($departments as $department)
                         <tr>
-                            <td>{{$department->abbrivation}}</td>
+                            <td class="text-center">{{$department->abbrivation}}</td>
                             <td class="text-center">{{$department->total_findings}}</td>
                             <td class="text-center">{{$department->closed_findings}}</td>
-                            <td class="text-center">{{$department->percentage_closed}}%</td>
-                            <td class="text-center">{{$department->totalCompletionDays}} hari</td>
-                            <td class="text-center">{{$department->totalPoints ?? '0'}}</td>
+                            <td class="text-center px-4 py-3">
+                                @php
+                                $percent = $department->percentage_closed;
+                                if ($percent < 40) { $color='bg-red-100 text-red-700' ; } elseif ($percent < 70) {
+                                    $color='bg-yellow-100 text-yellow-700' ; } elseif ($percent < 90) {
+                                    $color='bg-green-100 text-green-700' ; } else {
+                                    $color='bg-emerald-100 text-emerald-700' ; } @endphp <span
+                                    class="px-3 py-1 text-sm font-semibold rounded-full {{ $color }}">
+                                    {{ $percent }}%
+                                    </span>
+                            </td>
+
+                            <td class="text-center px-4 py-3">{{$department->totalCompletionDays}} hari</td>
+                            <td class="text-center px-4 py-3">
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold"
+                                    style="background-color: #FAF5FF; color: #6B21A8;">
+                                    {{ $department->totalPoints ?? '0' }}
+                                </span>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
